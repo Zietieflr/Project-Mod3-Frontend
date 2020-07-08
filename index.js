@@ -5,6 +5,10 @@ let pose
 let drawPath = []
 let canvasStatus = 'play'
 let handedness = 'leftWrist'
+const leftRight = {
+  'leftWrist': 'rightWrist',
+  'rightWrist': 'leftWrist'
+}
 let leftShoulder = []
 let rightShoulder = []
 let shoulders = [ leftShoulder , rightShoulder ]
@@ -103,13 +107,23 @@ function capturePose(poseData) {
 function bodyPointTrackingTwoRelated(bodyPointA, bodyPointB, bodyCapture, storePoints ) {
   bodyPointTracking(bodyPointA, bodyCapture, storePoints[0])
   bodyPointTracking(bodyPointB, bodyCapture, storePoints[1])
-  if(storePoints[0].length > 1) { storePoints[0].shift() }
-  if(storePoints[1].length > 1) { storePoints[1].shift() }
-  pauseBox(storePoints)
+  if (bodyCapture) {
+    if(storePoints[0].length > 1) { storePoints[0].shift() }
+    if(storePoints[1].length > 1) { storePoints[1].shift() }
+    pauseBox(storePoints, bodyCapture)
+  }
 }
 
-function pauseBox(points) {
-  
+function pauseBox(points, bodyCapture) {
+  difference = (points[0][0].x - points[1][0].x)/2
+  let offHand = []
+  bodyPointTracking(leftRight[handedness], bodyCapture, offHand)
+  if (
+    (offHand[0].x > points[1][0].x ) &&
+    (offHand[0].y > points[0][0].y - difference) &&
+    (offHand[0].x < points[0][0].x) &&
+    (offHand[0].y < points[1][0].y + difference)
+  ) {console.log('Offhand wrist in target area.')}
 }
 
 function bodyPointTracking(bodyPoint, bodyCapture, storePoints) {
