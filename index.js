@@ -11,13 +11,16 @@ let canvasStatus = 'idle'
 
 const $ = {
   main: document.querySelector('main'),
-  timer: document.querySelector('.timer')
+  timer: document.querySelector('.timer'),
+  userInput: document.querySelector('.user-input')
 }
+
+$.userInput.addEventListener('submit', startGame)
 
 const canvasRender = {
   idle: idleGame,
   begin: 1,
-  end: 2,
+  end: endGameDrawing,
   play: playingGame, 
 }
 
@@ -28,7 +31,7 @@ function setup() {
 }
 
 function draw() {
-  renderCanvas(canvasRender, 'play')  
+  renderCanvas(canvasRender, canvasStatus)  
 }
 
 function renderCanvas(lookupTable, lookupQuery) {
@@ -48,12 +51,13 @@ function startGame(event) {
   // start countdown
   // change status
 
-  event.target.preventDefault()
+  event.preventDefault()
+  video.play()
   renderVideo()
-  countdown($.timer, 20)
-  window.setTimeout(endGame)
+  visualCountdown($.timer, 20)
   canvasStatus = 'play' 
   looping()
+  window.setTimeout(endGame, 20*1000)
 }
 
 function endGame() {
@@ -65,10 +69,22 @@ function endGame() {
   // stop looping 
   
   video.pause()
+  canvasStatus = 'end'
+  // save the drawPath for the backend
+  window.setTimeout((() => {
+    canvasStatus = 'idle'
+    // redraw()
+  }), 5*1000)
+}
 
+function endGameDrawing() {
+  background(250, 250, 250)
+  renderPath2(drawPath, 10)
+  noLooping()
 }
 
 function playingGame() {
+  renderVideo()
   bodyPointTracking('leftWrist', pose, drawPath)
   renderPath(drawPath, 10)
 }
@@ -82,7 +98,7 @@ function initiateVideoCapture() {
   video.hide()
   frameRate(15)
   poseNet = ml5.poseNet(video, modelLoaded)
-  // poseNet.on('pose', capturePose)
+  poseNet.on('pose', capturePose)
 }
 
 function capturePose(poseData) {
@@ -111,32 +127,36 @@ function renderPath(strokePath, weightStroke) {
   }
 }
 
+function renderPath2(strokePath, weightStroke) {
+  noFill()
+  strokeWeight(weightStroke)
+  stroke(255, 0, 0)
+  beginShape()
+    strokePath.forEach(point => vertex(point.x - 320, point.y))
+  endShape()
+}
+
 function renderVideo() {
   translate(video.width, 0)
   scale(-1, 1)
   image(video, 320, 0)
 }
 
-window.addEventListener('mouseup', looping)
 function looping() {
   loop()
 }
 
-window.addEventListener('mousedown', noLooping)
 function noLooping() {
   noLoop()
 }
 
-$.timer.addEventListener('click', event => visualCountdown(event.target, 20))
-
-function visualCountdown(counter, $timeDisplay) {
-  $timeDisplay.value
+function visualCountdown($timeDisplay, counter) {
   count = setInterval(function() {
-  counter >= 10 
-    ? $timeDisplay.textContent = `00:${counter}`
-    : $timeDisplay.textContent = `00:0${counter}`
-  if (counter <= 0) clearInterval(count)
-  counter--
+    counter >= 10 
+      ? $timeDisplay.textContent = `00:${counter}`
+      : $timeDisplay.textContent = `00:0${counter}`
+    if (counter <= 0) clearInterval(count)
+    counter--
   }, 1000)
 }
 
