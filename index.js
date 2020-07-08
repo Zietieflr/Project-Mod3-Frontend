@@ -1,13 +1,13 @@
-console.log('ml5', ml5.version)
-console.log('p5', window.p5)
-console.log('window', window.innerWidth)
-
 let windowWidth = window.innerWidth
 let video
 let poseNet
 let pose
 let drawPath = []
-let canvasStatus = 'idle'
+let canvasStatus = 'play'
+let handedness = 'leftWrist'
+let leftShoulder = []
+let rightShoulder = []
+let shoulders = [ leftShoulder , rightShoulder ]
 
 const $ = {
   main: document.querySelector('main'),
@@ -25,9 +25,8 @@ const canvasRender = {
 }
 
 function setup() {
-  createCanvas(640, 640).parent($.main)
+  createCanvas(640, 480).parent($.main)
   initiateVideoCapture()
-  console.log('video', video)
 }
 
 function draw() {
@@ -40,52 +39,43 @@ function renderCanvas(lookupTable, lookupQuery) {
 
 function idleGame() {
   background(250, 250, 250)
-  noLooping()
+  noLoop()
 }
 
 function startGame(event) {
-  // start from event listener
-  // stop default
-  // show video
-  // start looping
-  // start countdown
-  // change status
-
   event.preventDefault()
   video.play()
   renderVideo()
   visualCountdown($.timer, 20)
+  userFormData(event.target)
   canvasStatus = 'play' 
-  looping()
+  loop()
   window.setTimeout(endGame, 20*1000)
 }
 
 function endGame() {
-  // pause/end video feed
-  // render background
-  // render completed drawing
-  // save drawing
-  // reset to play new game
-  // stop looping 
-  
   video.pause()
   canvasStatus = 'end'
   // save the drawPath for the backend
   window.setTimeout((() => {
     canvasStatus = 'idle'
-    // redraw()
+    redraw()
+    drawPath = []
   }), 5*1000)
 }
 
 function endGameDrawing() {
   background(250, 250, 250)
-  renderPath2(drawPath, 10)
-  noLooping()
+    translate(640, 0)
+    scale(-1, 1)
+  renderPath(drawPath, 10)
+  noLoop()
 }
 
 function playingGame() {
   renderVideo()
-  bodyPointTracking('leftWrist', pose, drawPath)
+  bodyPointTracking(handedness, pose, drawPath)
+  bodyPointTrackingTwoRelated('leftShoulder', 'rightShoulder', pose, shoulders)
   renderPath(drawPath, 10)
 }
 
@@ -96,6 +86,9 @@ function modelLoaded() {
 function initiateVideoCapture() {
   video = createCapture(VIDEO)
   video.hide()
+  $.video = document.querySelector('video')
+  $.video.width = 640
+  $.video.height = 480
   frameRate(15)
   poseNet = ml5.poseNet(video, modelLoaded)
   poseNet.on('pose', capturePose)
@@ -107,11 +100,23 @@ function capturePose(poseData) {
   }
 }
 
-function bodyPointTracking(bodyPoint, bodyCapture, strokePath) {
+function bodyPointTrackingTwoRelated(bodyPointA, bodyPointB, bodyCapture, storePoints ) {
+  bodyPointTracking(bodyPointA, bodyCapture, storePoints[0])
+  bodyPointTracking(bodyPointB, bodyCapture, storePoints[1])
+  if(storePoints[0].length > 1) { storePoints[0].shift() }
+  if(storePoints[1].length > 1) { storePoints[1].shift() }
+  pauseBox(storePoints)
+}
+
+function pauseBox(points) {
+  
+}
+
+function bodyPointTracking(bodyPoint, bodyCapture, storePoints) {
   if (bodyCapture) {
     fill(255, 0, 0)
-    ellipse(bodyCapture[bodyPoint].x + 320, bodyCapture[bodyPoint].y, 20)
-    strokePath.push(createVector(bodyCapture[bodyPoint].x + 320, bodyCapture[bodyPoint].y))
+    ellipse(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y, 20)
+    storePoints.push(createVector(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y))
   }
 }
 
@@ -122,32 +127,19 @@ function renderPath(strokePath, weightStroke) {
   beginShape()
     strokePath.forEach(point => vertex(point.x, point.y))
   endShape()
-  if(strokePath.length > 500) {
-    strokePath.shift()
-  }
-}
-
-function renderPath2(strokePath, weightStroke) {
-  noFill()
-  strokeWeight(weightStroke)
-  stroke(255, 0, 0)
-  beginShape()
-    strokePath.forEach(point => vertex(point.x - 320, point.y))
-  endShape()
+  if(strokePath.length > 400) { strokePath.shift() }
 }
 
 function renderVideo() {
-  translate(video.width, 0)
+  translate(640, 0)
   scale(-1, 1)
-  image(video, 320, 0)
+  image(video, 0, 0, 640, 480)
 }
 
-function looping() {
-  loop()
-}
-
-function noLooping() {
-  noLoop()
+function userFormData(form) {
+  let formData = new FormData(form)
+  let preferredHand = formData.get('lefty')
+  if (!preferredHand) { handedness = 'rightWrist' }
 }
 
 function visualCountdown($timeDisplay, counter) {
@@ -155,8 +147,7 @@ function visualCountdown($timeDisplay, counter) {
     counter >= 10 
       ? $timeDisplay.textContent = `00:${counter}`
       : $timeDisplay.textContent = `00:0${counter}`
-    if (counter <= 0) clearInterval(count)
+    if (counter <= 0) {clearInterval(count)}
     counter--
   }, 1000)
 }
-
