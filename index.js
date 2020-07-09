@@ -3,7 +3,7 @@ let video
 let poseNet
 let pose
 let drawPath = []
-let canvasStatus = 'play'
+let canvasStatus = 'idle'
 let handedness = 'leftWrist'
 const leftRight = {
   'leftWrist': 'rightWrist',
@@ -12,25 +12,32 @@ const leftRight = {
 let leftShoulder = []
 let rightShoulder = []
 let shoulders = [ leftShoulder , rightShoulder ]
+let category
 
 const $ = {
   main: document.querySelector('main'),
   timer: document.querySelector('.timer'),
-  userInput: document.querySelector('.user-input')
+  category: document.querySelector('.category'),
+  userInput: document.querySelector('.user-input'),
+  splashPage: document.querySelector('.splash'),
+}
+
+const url = {
+  random: 'http://localhost:3000/random'
 }
 
 $.userInput.addEventListener('submit', startGame)
 
 const canvasRender = {
   idle: idleGame,
-  begin: 1,
   end: endGameDrawing,
   play: playingGame, 
 }
 
 function setup() {
   createCanvas(640, 480).parent($.main)
-  initiateVideoCapture()
+  // initiateVideoCapture()
+  getCategory()
 }
 
 function draw() {
@@ -50,6 +57,7 @@ function startGame(event) {
   event.preventDefault()
   video.play()
   renderVideo()
+  $.category.textContent = category
   visualCountdown($.timer, 20)
   userFormData(event.target)
   canvasStatus = 'play' 
@@ -60,6 +68,8 @@ function startGame(event) {
 function endGame() {
   video.pause()
   canvasStatus = 'end'
+  $.category.textContent = ''
+  getCategory()
   // save the drawPath for the backend
   window.setTimeout((() => {
     canvasStatus = 'idle'
@@ -85,6 +95,7 @@ function playingGame() {
 
 function modelLoaded() {
   console.log('model loaded (poseNet)')
+  console.log('category', category)
 }
 
 function initiateVideoCapture() {
@@ -123,13 +134,13 @@ function pauseBox(points, bodyCapture) {
     (offHand[0].y > points[0][0].y - difference) &&
     (offHand[0].x < points[0][0].x) &&
     (offHand[0].y < points[1][0].y + difference)
-  ) {console.log('Offhand wrist in target area.')}
+  ) {}
 }
 
 function bodyPointTracking(bodyPoint, bodyCapture, storePoints) {
   if (bodyCapture) {
-    fill(255, 0, 0)
-    ellipse(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y, 20)
+    // fill(255, 0, 0)
+    // ellipse(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y, 20)
     storePoints.push(createVector(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y))
   }
 }
@@ -157,11 +168,29 @@ function userFormData(form) {
 }
 
 function visualCountdown($timeDisplay, counter) {
+  resetCounter = counter 
+  $timeDisplay.textContent = `00:${counter}`
   count = setInterval(function() {
-    counter >= 10 
+    counter--
+    (counter >= 10)
       ? $timeDisplay.textContent = `00:${counter}`
       : $timeDisplay.textContent = `00:0${counter}`
-    if (counter <= 0) {clearInterval(count)}
-    counter--
+    if (counter <= 0) {
+      clearInterval(count)
+      $timeDisplay.textContent = `00:${resetCounter}`
+    }
   }, 1000)
+}
+
+function boilerPlateGet(url, method) {
+  return fetch(url, {
+    method: method, 
+    headers: {'Content-Type': 'application/json'},
+  })
+}
+
+function getCategory() {
+  boilerPlateGet(url.random, 'GET')
+    .then(response => response.json())
+    .then(result => category = result.title)
 }
