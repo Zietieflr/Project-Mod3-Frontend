@@ -16,6 +16,7 @@ let category
 
 const $ = {
   main: document.querySelector('main'),
+  draw: document.querySelector('.drawing-area'),
   timer: document.querySelector('.timer'),
   category: document.querySelector('.category'),
   userInput: document.querySelector('.user-input'),
@@ -35,7 +36,7 @@ const canvasRender = {
 }
 
 function setup() {
-  createCanvas(640, 480).parent($.main)
+  createCanvas(640, 480).parent($.draw)
   // initiateVideoCapture()
   getCategory()
 }
