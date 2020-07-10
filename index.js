@@ -21,6 +21,7 @@ const $ = {
   category: document.querySelector('.category'),
   userInput: document.querySelector('.user-input'),
   splashPage: document.querySelector('.splash'),
+  enter: document.querySelector('header'),
 }
 
 const url = {
@@ -37,7 +38,7 @@ const canvasRender = {
 
 function setup() {
   createCanvas(640, 480).parent($.draw)
-  // initiateVideoCapture()
+  initiateVideoCapture()
   getCategory()
 }
 
@@ -80,10 +81,10 @@ function endGame() {
 }
 
 function endGameDrawing() {
-  background(250, 250, 250)
+  background(240, 240, 240)
     translate(640, 0)
     scale(-1, 1)
-  renderPath(drawPath, 10)
+  renderPath(drawPath, 5)
   noLoop()
 }
 
@@ -91,12 +92,13 @@ function playingGame() {
   renderVideo()
   bodyPointTracking(handedness, pose, drawPath)
   bodyPointTrackingTwoRelated('leftShoulder', 'rightShoulder', pose, shoulders)
-  renderPath(drawPath, 10)
+  renderPath(drawPath, 5)
 }
 
 function modelLoaded() {
-  console.log('model loaded (poseNet)')
-  console.log('category', category)
+  $.enter.addEventListener('click', event => {
+    $.splashPage.classList.add('hidden')
+  })
 }
 
 function initiateVideoCapture() {
@@ -149,7 +151,7 @@ function bodyPointTracking(bodyPoint, bodyCapture, storePoints) {
 function renderPath(strokePath, weightStroke) {
   noFill()
   strokeWeight(weightStroke)
-  stroke(255, 0, 0)
+  stroke(15, 15, 15)
   beginShape()
     strokePath.forEach(point => vertex(point.x, point.y))
   endShape()

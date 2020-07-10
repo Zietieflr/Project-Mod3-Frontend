@@ -1,3 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Mali:wght@300;400;500;700&display=swap');
+
 body {
-  background-color: lightsteelblue;
+  font-family: 'Mali', cursive;
+  color: hsl(214, 20%, 20%);
+}
+
+body > div.blur {
+  background-image: linear-gradient(hsla(214, 78%, 78%, .7), hsla(214, 41%, 78%, .7)),
+                    url('/images/pawel-czerwinski-WteXlFwm0jY-unsplash.jpg');
+  background-position: center;
+  background-size: cover;
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(5px)
+}
+
+main {
+  position: absolute;
+  height: 42rem;
+  width: 48.5rem; 
+  background: linear-gradient(-80deg, hsl(214, 41%, 78%), 85%, hsl(214, 41%, 78%, 0));
+  box-shadow: 4px 3px 5px hsl(214, 41%, 20%);
+  border-bottom-right-radius: 30% 14%;
+  left: 0;
+  top: 0; 
+}
+
+main > h1 {
+  font-size: 5rem;
+  font-weight: 300;
+  transform: rotate(-90deg);
+  position: absolute;
+  left: -11rem;   
+  bottom: 18rem;  
+  letter-spacing: 3rem;
+}
+
+main > .drawing-area {
+  position: absolute;
+  left: 6rem; 
+  bottom: 5.5rem; 
+  width: 640px;
+  height: 480px;
+}
+
+main > div > canvas {
+  border-radius: .5rem;
+  box-shadow: 4px 3px 5px hsl(214, 41%, 20%);
+}
+
+main > form {
+  position: absolute;
+  display: flex;
+  bottom: 1rem;
+  left: 6rem; 
+  width: 640px; 
+  justify-content: space-between;
+}
+
+main > form > input[type=submit] {
+  font-family: 'Mali', cursive;
+  font-size: 2rem;
+  padding: .25rem; 
+  padding-left: .75rem;
+  padding-right: .75rem;
+  margin-left: .5rem;
+  border-radius: 1rem;
+  background-color: hsl(124, 55%, 60%);
+}
+
+main > form > label {
+  font-size: 1.15rem;
+  margin-right: 2rem;
+}
+
+main > div > p {
+  position: absolute;
+  bottom: 35.8rem;
+  font-size: 2.5rem; 
+  font-weight: 500;
+}
+
+main > div > p.category {
+  left: 6rem; 
+}
+
+main > div > p.timer {
+  left: 39.3rem;
+  justify-content: right; 
+}
+
+section {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  left: 0; 
+  top: 0; 
+}
+
+section > .blur {
+  background-image: linear-gradient(hsla(214, 78%, 67%, .5), hsla(214, 78%, 67%, .5)),
+                    url('/images/kimberly-sterling-YlDP0IkQuxA-unsplash.jpg');
+  filter: blur(6px);
+  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+section > header {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  background-color: hsl(214, 20%, 95%);
+  box-shadow: 4px 3px 5px hsl(214, 41%, 20%);
+  border-radius: .5rem;
+  border-bottom-right-radius: 40% 30%;
+  border-top-left-radius: 40% 30%;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+section > header:active {
+  box-shadow: -4px -3px 5px hsl(214, 41%, 20%)
+}
+
+section > header > h1 {
+  font-size: 4rem;
+  margin-bottom: 2rem;
+}
+
+section > header > h3 {
+  font-size: 2rem;
+}
+
+.hidden {
+  display: none;
 }
