@@ -46,15 +46,6 @@ function draw() {
   renderCanvas(canvasRender, canvasStatus)  
 }
 
-function renderCanvas(lookupTable, lookupQuery) {
-  lookupTable[`${lookupQuery}`]()
-}
-
-function idleGame() {
-  background(240, 240, 240)
-  noLoop()
-}
-
 function startGame(event) {
   event.preventDefault()
   video.play()
@@ -72,7 +63,6 @@ function endGame() {
   canvasStatus = 'end'
   $.category.textContent = ''
   getCategory()
-  // save the drawPath for the backend
   window.setTimeout((() => {
     canvasStatus = 'idle'
     redraw()
@@ -91,14 +81,16 @@ function endGameDrawing() {
 function playingGame() {
   renderVideo()
   bodyPointTracking(handedness, pose, drawPath)
-  bodyPointTrackingTwoRelated('leftShoulder', 'rightShoulder', pose, shoulders)
   renderPath(drawPath, 5)
 }
 
-function modelLoaded() {
-  $.enter.addEventListener('click', event => {
-    $.splashPage.classList.add('hidden')
-  })
+function idleGame() {
+  background(240, 240, 240)
+  noLoop()
+}
+
+function renderCanvas(lookupTable, lookupQuery) {
+  lookupTable[`${lookupQuery}`]()
 }
 
 function initiateVideoCapture() {
@@ -112,40 +104,28 @@ function initiateVideoCapture() {
   poseNet.on('pose', capturePose)
 }
 
+function modelLoaded() {
+  $.enter.addEventListener('click', event => {
+    $.splashPage.classList.add('hidden')
+  })
+}
+
 function capturePose(poseData) {
   if (poseData.length) {
     pose = poseData[0].pose;
   }
 }
 
-function bodyPointTrackingTwoRelated(bodyPointA, bodyPointB, bodyCapture, storePoints ) {
-  bodyPointTracking(bodyPointA, bodyCapture, storePoints[0])
-  bodyPointTracking(bodyPointB, bodyCapture, storePoints[1])
-  if (bodyCapture) {
-    if(storePoints[0].length > 1) { storePoints[0].shift() }
-    if(storePoints[1].length > 1) { storePoints[1].shift() }
-    pauseBox(storePoints, bodyCapture)
-  }
-}
-
-function pauseBox(points, bodyCapture) {
-  difference = (points[0][0].x - points[1][0].x)/2
-  let offHand = []
-  bodyPointTracking(leftRight[handedness], bodyCapture, offHand)
-  if (
-    (offHand[0].x > points[1][0].x ) &&
-    (offHand[0].y > points[0][0].y - difference) &&
-    (offHand[0].x < points[0][0].x) &&
-    (offHand[0].y < points[1][0].y + difference)
-  ) {}
-}
-
 function bodyPointTracking(bodyPoint, bodyCapture, storePoints) {
   if (bodyCapture) {
-    // fill(255, 0, 0)
-    // ellipse(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y, 20)
     storePoints.push(createVector(bodyCapture[bodyPoint].x, bodyCapture[bodyPoint].y))
   }
+}
+
+function renderVideo() {
+  translate(640, 0)
+  scale(-1, 1)
+  image(video, 0, 0, 640, 480)
 }
 
 function renderPath(strokePath, weightStroke) {
@@ -156,12 +136,6 @@ function renderPath(strokePath, weightStroke) {
     strokePath.forEach(point => vertex(point.x, point.y))
   endShape()
   if(strokePath.length > 400) { strokePath.shift() }
-}
-
-function renderVideo() {
-  translate(640, 0)
-  scale(-1, 1)
-  image(video, 0, 0, 640, 480)
 }
 
 function userFormData(form) {
@@ -196,4 +170,28 @@ function getCategory() {
   boilerPlateGet(url.random, 'GET')
     .then(response => response.json())
     .then(result => category = result.title)
+}
+
+// Playing game
+// bodyPointTrackingTwoRelated('leftShoulder', 'rightShoulder', pose, shoulders)
+function bodyPointTrackingTwoRelated(bodyPointA, bodyPointB, bodyCapture, storePoints ) {
+  bodyPointTracking(bodyPointA, bodyCapture, storePoints[0])
+  bodyPointTracking(bodyPointB, bodyCapture, storePoints[1])
+  if (bodyCapture) {
+    if(storePoints[0].length > 1) { storePoints[0].shift() }
+    if(storePoints[1].length > 1) { storePoints[1].shift() }
+    pauseBox(storePoints, bodyCapture)
+  }
+}
+
+function pauseBox(points, bodyCapture) {
+  difference = (points[0][0].x - points[1][0].x)/2
+  let offHand = []
+  bodyPointTracking(leftRight[handedness], bodyCapture, offHand)
+  if (
+    (offHand[0].x > points[1][0].x ) &&
+    (offHand[0].y > points[0][0].y - difference) &&
+    (offHand[0].x < points[0][0].x) &&
+    (offHand[0].y < points[1][0].y + difference)
+  ) {}
 }
