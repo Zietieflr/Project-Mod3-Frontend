@@ -11,6 +11,7 @@ A small Scottish coin, not worth very much, according to Google. In this instanc
 I was inspired to use the ml5.js library, but I didn't have a good direction to implement the project until I saw the project [Quick, Draw!](https://quickdraw.withgoogle.com/). From there, the pieces fell into place and bodle was born. 
 
 ## Demonstration 
+Video - https://youtu.be/RIta49j5Eus
 
 ## Installation
 Most of this project uses cdn references in the HTML, so the installation is fairly light. Once you have the file locally and have followed the steps to get the [Backend Repository](https://github.com/Zietieflr/Project-Mod3-Backend) running, you simply need to host the local server. I used [lite-server](https://github.com/johnpapa/lite-server). 
