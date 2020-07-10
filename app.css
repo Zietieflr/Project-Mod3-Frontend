@@ -120,6 +120,7 @@ section > header {
   left: 50%;
   z-index: 1;
   transform: translate(-50%, -50%);
+  width: 27rem; 
   background-color: hsl(214, 20%, 95%);
   box-shadow: 4px 3px 5px hsl(214, 41%, 20%);
   border-radius: .5rem;

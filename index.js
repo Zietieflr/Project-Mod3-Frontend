@@ -51,7 +51,7 @@ function renderCanvas(lookupTable, lookupQuery) {
 }
 
 function idleGame() {
-  background(250, 250, 250)
+  background(240, 240, 240)
   noLoop()
 }
 
@@ -151,7 +151,7 @@ function bodyPointTracking(bodyPoint, bodyCapture, storePoints) {
 function renderPath(strokePath, weightStroke) {
   noFill()
   strokeWeight(weightStroke)
-  stroke(15, 15, 15)
+  stroke(154, 182, 219)
   beginShape()
     strokePath.forEach(point => vertex(point.x, point.y))
   endShape()
